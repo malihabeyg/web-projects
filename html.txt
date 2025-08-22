@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freelancer Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6/dist/umd/react-router-dom.development.js"></script>
+    <style>
+        /* Your CSS remains exactly the same */
+        :root {
+            --pink-50: #fdf2f8;
+            --pink-100: #fce7f3;
+            --pink-200: #fbcfe8;
+            --pink-300: #f9a8d4;
+            --pink-400: #f472b6;
+            --pink-500: #ec4899;
+            --pink-600: #db2777;
+            --pink-700: #be185d;
+            --pink-800: #9d174d;
+            --pink-900: #831843;
+            
+            --lilac-50: #f5f3ff;
+            --lilac-100: #ede9fe;
+            --lilac-200: #ddd6fe;
+            --lilac-300: #c4b5fd;
+            --lilac-400: #a78bfa;
+            --lilac-500: #8b5cf6;
+            --lilac-600: #7c3aed;
+            --lilac-700: #6d28d9;
+            --lilac-800: #5b21b6;
+            --lilac-900: #4c1d95;
+            
+            --text-dark: #1f2937;
+            --text-light: #f9fafb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            color: var(--text-dark);
+            background-color: var(--pink-50);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(to bottom, var(--pink-600), var(--lilac-600));
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+        }
+        
+        .sidebar-header h2 i {
+            color: white;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--pink-100);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--pink-300);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Header Styles */
+        .top-header {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--pink-50);
+            border-radius: 50px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+        
+        .search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 0 10px;
+            color: var(--text-dark);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-btn {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--pink-500);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pink-400), var(--lilac-400));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            color: var(--pink-700);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .card-icon.blue {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        
+        .card-icon.green {
+            background: linear-gradient(135deg, #10b981, #047857);
+        }
+        
+        .card-icon.pink {
+            background: linear-gradient(135deg, var(--pink-400), var(--pink-600));
+        }
+        
+        .card-icon.purple {
+            background: linear-gradient(135deg, var(--lilac-400), var(--lilac-600));
+        }
+        
+        .card-content h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .card-content p {
+            color: var(--text-dark);
+            opacity: 0.7;
+            font-size: 14px;
+        }
+        
+        /* Charts */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .chart-header h3 {
+            font-size: 18px;
+            color: var(--pink-700);
+        }
+        
+        /* Recent Activity */
+        .recent-activity {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .activity-list {
+            list-style: none;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--pink-100);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .activity-icon.blue {
+            background: #3b82f6;
+        }
+        
+        .activity-icon.green {
+            background: #10b981;
+        }
+        
+        .activity-icon.pink {
+            background: var(--pink-500);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-content h4 {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        
+        .activity-content p {
+            font-size: 13px;
+            color: var(--text-dark);
+            opacity: 0.7;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-dark);
+            opacity: 0.5;
+        }
+        
+        /* Projects Table */
+        .projects-table {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--pink-100);
+        }
+        
+        th {
+            color: var(--pink-700);
+            font-weight: 600;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status.completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status.in-progress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status.pending {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Profile Form */
+        .profile-form {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--pink-700);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--pink-200);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--pink-400);
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--pink-500), var(--lilac-500));
+            color: white;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+        
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 350px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            z-index: 100;
+            display: none;
+        }
+        
+        .notification-dropdown.show {
+            display: block;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--pink-100);
+        }
+        
+        .notification-header h3 {
+            font-size: 16px;
+            color: var(--pink-700);
+        }
+        
+        .notification-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--pink-100);
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-content p {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .notification-time {
+            font-size: 12px;
+            color: var(--text-dark);
+            opacity: 0.5;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar-header h2 span, .sidebar-menu a span {
+                display: none;
+            }
+            
+            .sidebar-header h2 {
+                justify-content: center;
+            }
+            
+            .sidebar-menu a {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .search-bar {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--pink-700);
+            cursor: pointer;
+        }
+        
+        /* React Router Simulation */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Simplified version without React Router for direct file execution
+        const { useState, useEffect, useRef } = React;
+        document.addEventListener("DOMContentLoaded", () => {
+  const menuBtn = document.querySelector(".mobile-menu-btn");
+  const sidebar = document.querySelector(".sidebar");
+
+  if (menuBtn && sidebar) {
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("active");
+    });
+  }
+});
+        // Main App Component
+        function App() {
+            const [sidebarOpen, setSidebarOpen] = useState(false);
+            const [notificationsOpen, setNotificationsOpen] = useState(false);
+            const [currentPage, setCurrentPage] = useState('overview');
+            const notificationRef = useRef(null);
+
+            // Close notifications when clicking outside
+            useEffect(() => {
+                function handleClickOutside(event) {
+                    if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+                        setNotificationsOpen(false);
+                    }
+                }
+                document.addEventListener("mousedown", handleClickOutside);
+                return () => {
+                    document.removeEventListener("mousedown", handleClickOutside);
+                };
+            }, []);
+
+            return (
+                <div className="dashboard">
+                    <Sidebar 
+                        sidebarOpen={sidebarOpen} 
+                        setSidebarOpen={setSidebarOpen}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                    />
+                    <div className="main-content">
+                        <TopHeader 
+                            sidebarOpen={sidebarOpen} 
+                            setSidebarOpen={setSidebarOpen}
+                            notificationsOpen={notificationsOpen}
+                            setNotificationsOpen={setNotificationsOpen}
+                            notificationRef={notificationRef}
+                        />
+                        <div className="content">
+                            {currentPage === 'overview' && <Overview />}
+                            {currentPage === 'projects' && <Projects />}
+                            {currentPage === 'profile' && <Profile />}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Sidebar Component
+        function Sidebar({ sidebarOpen, setSidebarOpen, currentPage, setCurrentPage }) {
+            const handleNavigation = (page) => {
+                setCurrentPage(page);
+                if (window.innerWidth < 768) {
+                    setSidebarOpen(false);
+                }
+            };
+            
+            return (
+                <div className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
+                    <div className="sidebar-header">
+                        <h2>
+                            <i className="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </h2>
+                    </div>
+                    <ul className="sidebar-menu">
+                        <li>
+                            <a 
+                                href="#" 
+                                className={currentPage === 'overview' ? 'active' : ''}
+                                onClick={(e) => { e.preventDefault(); handleNavigation('overview'); }}
+                            >
+                                <i className="fas fa-home"></i>
+                                <span>Overview</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a 
+                                href="#" 
+                                className={currentPage === 'projects' ? 'active' : ''}
+                                onClick={(e) => { e.preventDefault(); handleNavigation('projects'); }}
+                            >
+                                <i className="fas fa-project-diagram"></i>
+                                <span>Projects</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a 
+                                href="#" 
+                                className={currentPage === 'profile' ? 'active' : ''}
+                                onClick={(e) => { e.preventDefault(); handleNavigation('profile'); }}
+                            >
+                                <i className="fas fa-user-cog"></i>
+                                <span>Profile Settings</span>
+                            </a>
+                        </li>
+                       
+                        <li>
+                            <a href="#">
+                                <i className="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            );
+        }
+
+        // Top Header Component
+        function TopHeader({ sidebarOpen, setSidebarOpen, notificationsOpen, setNotificationsOpen, notificationRef }) {
+            return (
+                <div className="top-header">
+                    <button className="mobile-menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                        <i className="fas fa-bars"></i>
+                    </button>
+                    <div className="search-bar">
+                        <i className="fas fa-search"></i>
+                        <input type="text" placeholder="Search..." />
+                    </div>
+                    <div className="header-right">
+                        <div className="notification-btn" onClick={() => setNotificationsOpen(!notificationsOpen)}>
+                            <i className="fas fa-bell"></i>
+                            <span className="notification-badge">3</span>
+                        </div>
+                        <div className="user-profile">
+                            <div className="user-avatar">SA</div>
+                            <div className="user-info">
+                                <div className="user-name">Saad </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <NotificationDropdown 
+                        notificationsOpen={notificationsOpen} 
+                        notificationRef={notificationRef} 
+                    />
+                </div>
+            );
+        }
+
+        // Notification Dropdown Component
+        function NotificationDropdown({ notificationsOpen, notificationRef }) {
+            const notifications = [
+                {
+                    icon: 'fas fa-file-invoice',
+                    iconColor: 'blue',
+                    message: 'New project "Website Redesign" assigned to you',
+                    time: '10 mins ago'
+                },
+                {
+                    icon: 'fas fa-check-circle',
+                    iconColor: 'green',
+                    message: 'Project "Mobile App" completed successfully',
+                    time: '2 hours ago'
+                },
+                {
+                    icon: 'fas fa-exclamation-triangle',
+                    iconColor: 'pink',
+                    message: 'Deadline approaching for "Dashboard Design"',
+                    time: '5 hours ago'
+                }
+            ];
+
+            return (
+                <div ref={notificationRef} className={`notification-dropdown ${notificationsOpen ? 'show' : ''}`}>
+                    <div className="notification-header">
+                        <h3>Notifications</h3>
+                        <a href="#" className="view-all">View All</a>
+                    </div>
+                    <div className="notification-list">
+                        {notifications.map((notification, index) => (
+                            <div key={index} className="notification-item">
+                                <div className={`notification-icon ${notification.iconColor}`}>
+                                    <i className={notification.icon}></i>
+                                </div>
+                                <div className="notification-content">
+                                    <p>{notification.message}</p>
+                                    <div className="notification-time">{notification.time}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Overview Page Component
+        function Overview() {
+            const chartRef = useRef(null);
+            const chartInstance = useRef(null);
+            
+            useEffect(() => {
+                // Initialize chart when component mounts
+                if (chartRef.current) {
+                    // Destroy previous chart instance if it exists
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+                    
+                    const ctx = chartRef.current.getContext('2d');
+                    chartInstance.current = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Monthly Earnings ($)',
+                                data: [1200, 1900, 1500, 2200, 1800, 2500],
+                                backgroundColor: 'rgba(236, 72, 153, 0.6)',
+                                borderColor: 'rgba(236, 72, 153, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Clean up when component unmounts
+                return () => {
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+                };
+            }, []);
+            
+            return (
+                <div className="page active">
+                    <h1 className="page-title">
+                        <i className="fas fa-home"></i>
+                        Dashboard Overview
+                    </h1>
+                    
+                    <div className="summary-cards">
+                        <div className="summary-card">
+                            <div className="card-icon blue">
+                                <i className="fas fa-briefcase"></i>
+                            </div>
+                            <div className="card-content">
+                                <h3>12</h3>
+                                <p>Total Projects</p>
+                            </div>
+                        </div>
+                        <div className="summary-card">
+                            <div className="card-icon green">
+                                <i className="fas fa-dollar-sign"></i>
+                            </div>
+                            <div className="card-content">
+                                <h3>$8,540</h3>
+                                <p>Total Earnings</p>
+                            </div>
+                        </div>
+                        <div className="summary-card">
+                            <div className="card-icon pink">
+                                <i className="fas fa-tasks"></i>
+                            </div>
+                            <div className="card-content">
+                                <h3>7</h3>
+                                <p>Tasks Due</p>
+                            </div>
+                        </div>
+                        <div className="summary-card">
+                            <div className="card-icon purple">
+                                <i className="fas fa-check-circle"></i>
+                            </div>
+                            <div className="card-content">
+                                <h3>85%</h3>
+                                <p>Completion Rate</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="charts-container">
+                        <div className="chart-card">
+                            <div className="chart-header">
+                                <h3>Monthly Earnings</h3>
+                                <select className="chart-filter">
+                                    <option>Last 6 Months</option>
+                                    <option>Last 12 Months</option>
+                                </select>
+                            </div>
+                            <canvas ref={chartRef} id="earningsChart" height="250"></canvas>
+                        </div>
+                        <div className="chart-card">
+                            <div className="chart-header">
+                                <h3>Project Distribution</h3>
+                            </div>
+                            <canvas id="projectChart" height="250"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div className="recent-activity">
+                        <div className="chart-header">
+                            <h3>Recent Activity</h3>
+                            <a href="#" className="view-all">View All</a>
+                        </div>
+                        <ul className="activity-list">
+                            <li className="activity-item">
+                                <div className="activity-icon blue">
+                                    <i className="fas fa-plus"></i>
+                                </div>
+                                <div className="activity-content">
+                                    <h4>New project created</h4>
+                                    <p>You created a new project "E-commerce Website"</p>
+                                </div>
+                                <div className="activity-time">2 hours ago</div>
+                            </li>
+                            <li className="activity-item">
+                                <div className="activity-icon green">
+                                    <i className="fas fa-check"></i>
+                                </div>
+                                <div className="activity-content">
+                                    <h4>Project completed</h4>
+                                    <p>You completed the project "Mobile App Design"</p>
+                                </div>
+                                <div className="activity-time">1 day ago</div>
+                            </li>
+                            <li className="activity-item">
+                                <div className="activity-icon pink">
+                                    <i className="fas fa-comment"></i>
+                                </div>
+                                <div className="activity-content">
+                                    <h4>New message</h4>
+                                    <p>You received a new message from client John Doe</p>
+                                </div>
+                                <div className="activity-time">2 days ago</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            );
+        }
+
+        // Projects Page Component
+        function Projects() {
+            const projects = [
+                {
+                    id: 1,
+                    name: 'E-commerce Website',
+                    client: 'ABC Retail',
+                    deadline: '2023-08-15',
+                    status: 'In Progress',
+                    price: '$2,400'
+                },
+                {
+                    id: 2,
+                    name: 'Mobile App Design',
+                    client: 'Tech Solutions Inc.',
+                    deadline: '2023-07-30',
+                    status: 'Completed',
+                    price: '$3,200'
+                },
+                {
+                    id: 3,
+                    name: 'Brand Identity',
+                    client: 'StartUp Ventures',
+                    deadline: '2023-08-25',
+                    status: 'Pending',
+                    price: '$1,800'
+                },
+                {
+                    id: 4,
+                    name: 'Dashboard UI',
+                    client: 'Data Analytics Co.',
+                    deadline: '2023-09-05',
+                    status: 'In Progress',
+                    price: '$2,700'
+                },
+                {
+                    id: 5,
+                    name: 'Blog Platform',
+                    client: 'Content Creators LLC',
+                    deadline: '2023-08-10',
+                    status: 'In Progress',
+                    price: '$2,100'
+                }
+            ];
+            
+            const getStatusClass = (status) => {
+                switch(status) {
+                    case 'Completed': return 'status completed';
+                    case 'In Progress': return 'status in-progress';
+                    case 'Pending': return 'status pending';
+                    default: return 'status';
+                }
+            };
+            
+            return (
+                <div className="page active">
+                    <h1 className="page-title">
+                        <i className="fas fa-project-diagram"></i>
+                        My Projects
+                    </h1>
+                    
+                    <div className="projects-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Project Name</th>
+                                    <th>Client</th>
+                                    <th>Deadline</th>
+                                    <th>Status</th>
+                                    <th>Price</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {projects.map(project => (
+                                    <tr key={project.id}>
+                                        <td>{project.name}</td>
+                                        <td>{project.client}</td>
+                                        <td>{project.deadline}</td>
+                                        <td>
+                                            <span className={getStatusClass(project.status)}>
+                                                {project.status}
+                                            </span>
+                                        </td>
+                                        <td>{project.price}</td>
+                                        <td>
+                                            <button className="btn-icon">
+                                                <i className="fas fa-edit"></i>
+                                            </button>
+                                            <button className="btn-icon">
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        }
+
+        // Profile Page Component
+        function Profile() {
+            const [userData, setUserData] = useState({
+                name: 'Saad ',
+                email: 'saad@example.com',
+                phone: '+1 (555) 123-4567',
+                location: 'New York, USA'
+            });
+            
+            const handleInputChange = (e) => {
+                const { name, value } = e.target;
+                setUserData(prevState => ({
+                    ...prevState,
+                    [name]: value
+                }));
+            };
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                alert('Profile updated successfully!');
+            };
+            
+            return (
+                <div className="page active">
+                    <h1 className="page-title">
+                        <i className="fas fa-user-cog"></i>
+                        Profile Settings
+                    </h1>
+                    
+                    <form className="profile-form" onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label htmlFor="name">Full Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={userData.name}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="email">Email Address</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={userData.email}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="phone">Phone Number</label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                value={userData.phone}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="location">Location</label>
+                            <input
+                                type="text"
+                                id="location"
+                                name="location"
+                                value={userData.location}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="password">New Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Enter new password"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="confirmPassword">Confirm Password</label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                placeholder="Confirm new password"
+                            />
+                        </div>
+                        <button type="submit" className="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+        
+    </script>
+</body>
+</html>
